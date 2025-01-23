@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include "Grid.h"
 #include <vector>
 #include <string>
 #include <sstream>
@@ -8,20 +9,6 @@
 const int gridSize = 10;  // Grid dimensions
 const int cellSize = 40;  // Size of each grid cell
 
-// Function to draw a grid
-void drawGrid(sf::RenderWindow& window, int gridX, int gridY, int size, int cellSize) {
-    sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
-    cell.setOutlineThickness(1);
-    cell.setOutlineColor(sf::Color::Black);
-    cell.setFillColor(sf::Color::White);
-
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            cell.setPosition(gridX + j * cellSize, gridY + i * cellSize);
-            window.draw(cell);
-        }
-    }
-}
 
 // Function to create a button
 sf::RectangleShape createButton(int x, int y, int width, int height, sf::Color color) {
@@ -40,6 +27,8 @@ int main() {
     if (!font.loadFromFile("arial.ttf")) {
         return -1;
     }
+    // Create the grid object
+    Grid grid(200, 50, gridSize, cellSize, font);
 
     // Define layout dimensions
     int leftColumnWidth = 150;
@@ -125,7 +114,16 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-
+            // Mouse click handling for the grid
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    std::string word = grid.handleClick(event.mouseButton.x, event.mouseButton.y);
+                    if (!word.empty()) {
+                        userInput += word + " ";
+                        inputText.setString(userInput);
+                    }
+                }
+            }
             // Text input handling
             if (event.type == sf::Event::TextEntered) {
                 if (event.text.unicode == '\b' && !userInput.empty()) {
@@ -194,7 +192,8 @@ int main() {
         window.draw(dictText2);
 
         // Draw center column (grid, input box, and timer)
-        drawGrid(window, gridX, gridY, gridSize, cellSize);
+        //drawGrid(window, gridX, gridY, gridSize, cellSize);
+        grid.draw(window);
         window.draw(inputBox);
         window.draw(inputText);
         window.draw(timerText);
