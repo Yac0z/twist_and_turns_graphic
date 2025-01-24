@@ -108,7 +108,7 @@ int main() {
 
     // Enter Button (placed next to the timer, right side)
     sf::RectangleShape enterButton(sf::Vector2f(100, 50)); // Adjust button size if needed
-    float enterButtonX = timerText.getPosition().x + timerText.getLocalBounds().width + 20; // 20px gap to the right of the timer
+    float enterButtonX = timerText.getPosition().x + timerText.getLocalBounds().width + 190; // 20px gap to the right of the timer
     float enterButtonY = timerY; // Same vertical alignment as the timer
     enterButton.setPosition(enterButtonX, enterButtonY);
     enterButton.setFillColor(sf::Color::Green);
@@ -136,16 +136,16 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-            // Mouse click handling for the grid
-            if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    std::string word = grid.handleClick(event.mouseButton.x, event.mouseButton.y);
-                    if (!word.empty()) {
-                        userInput += word + " ";
-                        inputText.setString(userInput);
-                    }
-                }
-            }
+			// Mouse click handling for the grid
+			if (event.type == sf::Event::MouseButtonPressed) {
+				if (event.mouseButton.button == sf::Mouse::Left) {
+					// Pass the current user input to handleClick for toggling cell selection
+					grid.handleClick(event.mouseButton.x, event.mouseButton.y, userInput);
+
+					// Update the input text string with the modified userInput
+					inputText.setString(userInput);
+				}
+			}
             // Handle Text Input
             if (event.type == sf::Event::TextEntered) {
                 if (event.text.unicode == '\r') {  // Enter Key
