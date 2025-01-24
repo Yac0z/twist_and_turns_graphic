@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Grid.h"
+#include "Menu.h"
 #include <vector>
 #include <string>
 #include <sstream>
@@ -27,6 +28,9 @@ int main() {
     if (!font.loadFromFile("arial.ttf")) {
         return -1;
     }
+	// Menu
+	Menu menu(font);
+
     // Create the grid object
     Grid grid(200, 50, gridSize, cellSize, font);
 
@@ -214,6 +218,15 @@ int main() {
 
         // Rendering
         window.clear(sf::Color(200, 150, 100));  // Background color
+
+		// Draw Menu
+		menu.displayMenu(window);
+
+		// Retrieve user selections from the menu
+		std::string selectedDifficulty = menu.getSelectedDifficulty();
+		std::string selectedTheme = menu.getSelectedTheme();
+		int wordCount = menu.getWordCount();
+
 
         // Draw Player 1
         window.draw(player1Name);
