@@ -5,12 +5,6 @@
 #include <vector>
 #include <string>
 
-// Structure to hold the last two selected cells
-struct LastSelectedCells {
-	int first = -1, second = -1;  // current selected cell
-	int prevFirst = -1, prevSecond = -1;  // previous selected cell
-};
-
 class Grid {
 private:
 	int gridX, gridY;                        // Top-left corner of the grid
@@ -20,7 +14,7 @@ private:
 	std::vector<std::vector<std::string>> words; // Words in the grid
 	std::vector<std::vector<sf::RectangleShape>> cellShapes; // Shapes of the grid cells
 
-	LastSelectedCells lastSelectedCell;  // Tracks the last two selected cells
+	std::vector<std::pair<int, int>> selectedCells; // Vector to store selected cells
 
 public:
 	Grid(int x, int y, int size, int cellSize, const sf::Font& font);
