@@ -84,26 +84,48 @@ int main() {
     player2Name.setPosition(650, 310);
 
     // Center column: Matrix and Input box
-    int gridX = leftColumnWidth + 50;
-    int gridY = 50;
+    int gridX = leftColumnWidth + 50; // Start of the grid in the center
+    int gridY = 50;                  // Top margin of the grid
 
-    sf::RectangleShape inputBox(sf::Vector2f(centerColumnWidth - 100, 50));
+    // Input Box
+    sf::RectangleShape inputBox(sf::Vector2f(centerColumnWidth - 100, 50)); // Original size
     inputBox.setPosition(gridX, gridY + gridSize * cellSize + 20);
     inputBox.setFillColor(sf::Color::White);
     inputBox.setOutlineColor(sf::Color::Black);
     inputBox.setOutlineThickness(1);
 
+    // Input Text inside the box
     sf::Text inputText("", font, 20);
     inputText.setFillColor(sf::Color::Black);
-    inputText.setPosition(gridX + 10, gridY + gridSize * cellSize + 30);
+    inputText.setPosition(inputBox.getPosition().x + 10, inputBox.getPosition().y + 10);
 
-    sf::Text timerText("", font, 20);
+    // Timer Text (placed below the input box, left side)
+    sf::Text timerText("Time: 00.00s", font, 20);
     timerText.setFillColor(sf::Color::White);
-    float timerX = gridX + (inputBox.getSize().x - timerText.getLocalBounds().width) / 2;
-    timerText.setPosition(timerX, gridY + gridSize * cellSize + 80);
+    float timerX = inputBox.getPosition().x; // Align left with input box
+    float timerY = inputBox.getPosition().y + inputBox.getSize().y + 20; // 20px below the input box
+    timerText.setPosition(timerX, timerY);
+
+    // Enter Button (placed next to the timer, right side)
+    sf::RectangleShape enterButton(sf::Vector2f(100, 50)); // Adjust button size if needed
+    float enterButtonX = timerText.getPosition().x + timerText.getLocalBounds().width + 20; // 20px gap to the right of the timer
+    float enterButtonY = timerY; // Same vertical alignment as the timer
+    enterButton.setPosition(enterButtonX, enterButtonY);
+    enterButton.setFillColor(sf::Color::Green);
+
+    // Enter Button Label
+    sf::Text enterText("Enter", font, 20);
+    enterText.setFillColor(sf::Color::White);
+    float enterTextX = enterButton.getPosition().x + (enterButton.getSize().x - enterText.getLocalBounds().width) / 2;
+    float enterTextY = enterButton.getPosition().y + (enterButton.getSize().y - enterText.getLocalBounds().height) / 2 - 5; // Center vertically
+    enterText.setPosition(enterTextX, enterTextY);
+
+
+
 
     std::string userInput;
 
+    int scrollOffset = 0;  // Horizontal scroll offset
     // Create a clock for tracking elapsed time
     sf::Clock gameClock;
 
@@ -124,17 +146,30 @@ int main() {
                     }
                 }
             }
-            // Text input handling
+            // Handle Text Input
             if (event.type == sf::Event::TextEntered) {
-                if (event.text.unicode == '\b' && !userInput.empty()) {
-                    userInput.pop_back();
+                if (event.text.unicode == '\r') {  // Enter Key
+                    std::cout << "Submitted: " << userInput << std::endl;
+                    userInput.clear();  // Clear input after submission
+                    scrollOffset = 0;   // Reset scrolling
                 }
                 else if (event.text.unicode < 128 && event.text.unicode != '\b') {
-                    userInput += static_cast<char>(event.text.unicode);
+					//ignore alphabet characters form entered from the keyboard
+                    continue;
+                    //userInput += static_cast<char>(event.text.unicode);
                 }
-                inputText.setString(userInput);
+                else if (event.text.unicode == '\b' && !userInput.empty()) {
+                    userInput.pop_back();
+                }
             }
-
+            // Handle Enter Button Click
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (enterButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                    std::cout << "Submitted: " << userInput << std::endl;
+                    userInput.clear();  // Clear input after submission
+                    scrollOffset = 0;   // Reset scrolling
+                }
+            }
             // Button click handling
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (hintButton1.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
@@ -161,8 +196,17 @@ int main() {
         // Update timer
         sf::Time elapsed = gameClock.getElapsedTime();
         std::stringstream timerStream;
-        timerStream << "Time: " << std::fixed << std::setprecision(2) << elapsed.asSeconds() << "s";
+        timerStream << "Time: " << std::fixed << std::setprecision(0) << elapsed.asSeconds() << "s";
         timerText.setString(timerStream.str());
+        // Update scrolling
+        float textWidth = inputText.getGlobalBounds().width;
+        if (textWidth > inputBox.getSize().x - 20) {  // Allow scroll if text exceeds box width
+            scrollOffset = textWidth - (inputBox.getSize().x - 20);
+        }
+
+        // Set visible string with scroll offset
+        inputText.setString(userInput);
+        inputText.setPosition(inputBox.getPosition().x + 10 - scrollOffset, inputBox.getPosition().y + 10);
 
         // Center timer text
         float timerX = gridX + (inputBox.getSize().x - timerText.getLocalBounds().width) / 2;
@@ -196,6 +240,9 @@ int main() {
         grid.draw(window);
         window.draw(inputBox);
         window.draw(inputText);
+        window.draw(enterButton);
+        window.draw(enterText);
+
         window.draw(timerText);
 
         window.display();
