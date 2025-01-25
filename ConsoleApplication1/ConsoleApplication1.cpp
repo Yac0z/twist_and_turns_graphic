@@ -1,6 +1,6 @@
+#include "Menu.h"
 #include <SFML/Graphics.hpp>
 #include "Grid.h"
-#include "Menu.h"
 #include <vector>
 #include <string>
 #include <sstream>

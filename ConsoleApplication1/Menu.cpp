@@ -97,56 +97,74 @@ float Menu::getDropdownHeight(const std::vector<sf::Text>& options) {
 	if (options.empty()) return 0.0f;
 	return options.size() * (options[0].getGlobalBounds().height + 10);
 }
-
-void Menu::handleDropdownClick(sf::Vector2i mousePos, sf::RectangleShape& dropdown,
-	std::vector<sf::Text>& options, std::string& selectedOption,
-	bool& dropdownActive, bool& otherDropdownActive) {
-	if (dropdown.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-		dropdownActive = !dropdownActive;
-		otherDropdownActive = false;
+// Handle dropdown clicks
+void Menu::handleDropdownClick(sf::Vector2i mousePos, sf::RectangleShape& dropdown, std::vector<sf::Text>& options,
+	std::string& selectedOption, bool& dropdownActive) {
+	if (!dropdownActive) {
+		// Open the dropdown
+		if (dropdown.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+			dropdownActive = true;
+		}
 	}
-	else if (dropdownActive) {
-		for (int i = 0; i < options.size(); ++i) {
+	else {
+		// Check for clicks on options
+		for (size_t i = 0; i < options.size(); ++i) {
 			if (options[i].getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 				selectedOption = options[i].getString();
 				dropdownActive = false;
-				break;
+				return; // Exit once selection is made
 			}
+		}
+		// Close the dropdown if clicked outside
+		if (!dropdown.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+			dropdownActive = false;
 		}
 	}
 }
 
+// Handle slider movement
 void Menu::handleSliderClick(sf::Vector2i mousePos) {
 	if (sliderBar.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-		float newPosition = std::max(sliderBar.getPosition().x,
-			std::min((float)mousePos.x, sliderBar.getPosition().x + sliderBar.getSize().x));
-		sliderKnob.setPosition(newPosition, sliderKnob.getPosition().y);
-		wordCount = 3 + (int)((newPosition - sliderBar.getPosition().x) / (sliderBar.getSize().x / 7));
+		float newKnobX = static_cast<float>(mousePos.x);
+		if (newKnobX < sliderBar.getPosition().x) newKnobX = sliderBar.getPosition().x;
+		if (newKnobX > sliderBar.getPosition().x + sliderBar.getSize().x - sliderKnob.getSize().x) {
+			newKnobX = sliderBar.getPosition().x + sliderBar.getSize().x - sliderKnob.getSize().x;
+		}
+		sliderKnob.setPosition(newKnobX, sliderKnob.getPosition().y);
+
+		// Update word count dynamically
+		wordCount = static_cast<int>(3 + (newKnobX - sliderBar.getPosition().x) / 20); // Adjust scaling factor
 		wordCountLabel.setString("Word Count: " + std::to_string(wordCount));
 	}
 }
 
+// Handle menu events
 bool Menu::handleMenuEvents(sf::RenderWindow& window) {
 	sf::Event event;
 	while (window.pollEvent(event)) {
 		if (event.type == sf::Event::Closed) {
 			window.close();
-			return false;
 		}
 		else if (event.type == sf::Event::MouseButtonPressed) {
 			sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-			if (startButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-				return true; // Start button clicked
-			}
+			handleDropdownClick(mousePos, difficultyDropdown, difficultyOptions, selectedDifficulty, difficultyDropdownActive);
+			handleDropdownClick(mousePos, themeDropdown, themeOptions, selectedTheme, themeDropdownActive);
 
-			handleDropdownClick(mousePos, difficultyDropdown, difficultyOptions, selectedDifficulty, difficultyDropdownActive, themeDropdownActive);
-			handleDropdownClick(mousePos, themeDropdown, themeOptions, selectedTheme, themeDropdownActive, difficultyDropdownActive);
+			// Handle slider movement
 			handleSliderClick(mousePos);
+
+			// Start button click
+			if (startButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+				std::cout << "Selected Difficulty: " << selectedDifficulty << "\n";
+				std::cout << "Selected Theme: " << selectedTheme << "\n";
+				std::cout << "Word Count: " << wordCount << "\n";
+				return true; // Transition to game state
+			}
 		}
 	}
 	return false;
-}// Render the menu
+}
 void Menu::renderMenu(sf::RenderWindow& window) {
 	// Calculate dropdown heights
 	float difficultyHeight = difficultyDropdownActive ? getDropdownHeight(difficultyOptions) : 0.0f;

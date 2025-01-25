@@ -7,9 +7,9 @@
 
 class Menu {
 public:
-	Menu(); // Constructor
+	Menu();
 
-	// Handle menu events for a single frame
+	// Handle menu events (clicks)
 	bool handleMenuEvents(sf::RenderWindow& window);
 
 	// Render the menu
@@ -21,47 +21,36 @@ public:
 	int getWordCount() const;
 
 private:
-	// Font for text
+	// Private members for handling the menu UI components
 	sf::Font font;
 
-	// Title text
 	sf::Text titleText;
-
-	// Start button
 	sf::RectangleShape startButton;
 	sf::Text startButtonText;
 
-	// Difficulty dropdown
 	sf::Text difficultyLabel;
 	sf::RectangleShape difficultyDropdown;
 	std::vector<sf::Text> difficultyOptions;
-	sf::Text selectedDifficultyText;
 	bool difficultyDropdownActive;
 	std::string selectedDifficulty;
+	sf::Text selectedDifficultyText;
 
-	// Theme dropdown
 	sf::Text themeLabel;
 	sf::RectangleShape themeDropdown;
 	std::vector<sf::Text> themeOptions;
-	sf::Text selectedThemeText;
 	bool themeDropdownActive;
 	std::string selectedTheme;
+	sf::Text selectedThemeText;
 
-	// Word count slider
 	sf::Text wordCountLabel;
 	sf::RectangleShape sliderBar;
 	sf::RectangleShape sliderKnob;
 	int wordCount;
 
-	// Helper method for handling dropdown clicks
-	void handleDropdownClick(sf::Vector2i mousePos, sf::RectangleShape& dropdown,
-		std::vector<sf::Text>& options, std::string& selectedOption,
-		bool& dropdownActive, bool& otherDropdownActive);
-
-	// Helper method to calculate dropdown height
+	// Private methods to handle dropdown and slider interactions
 	float getDropdownHeight(const std::vector<sf::Text>& options);
-
-	// Helper method for handling slider movement
+	void handleDropdownClick(sf::Vector2i mousePos, sf::RectangleShape& dropdown, std::vector<sf::Text>& options,
+		std::string& selectedOption, bool& dropdownActive);
 	void handleSliderClick(sf::Vector2i mousePos);
 };
 
