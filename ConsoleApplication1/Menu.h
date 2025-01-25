@@ -2,55 +2,52 @@
 #define MENU_H
 
 #include <SFML/Graphics.hpp>
-#include <vector>
 #include <string>
-#include <iostream>
-#include <algorithm>
+#include <vector>
 
 class Menu {
 private:
-	const sf::Font& font;
+	sf::Font font;  // Font for text elements
+	sf::Text selectedDifficultyText; // Text to display selected difficulty
+	sf::Text selectedThemeText;      // Text to display selected theme
 
-	// Title
+	// Menu components
 	sf::Text titleText;
-
-	// Start Button
 	sf::RectangleShape startButton;
 	sf::Text startButtonText;
 
-	// Difficulty Dropdown
+	// Dropdown components
 	sf::Text difficultyLabel;
 	sf::RectangleShape difficultyDropdown;
 	std::vector<sf::Text> difficultyOptions;
 	bool difficultyDropdownActive;
-	std::string selectedDifficulty;
 
-	// Theme Dropdown
 	sf::Text themeLabel;
 	sf::RectangleShape themeDropdown;
 	std::vector<sf::Text> themeOptions;
 	bool themeDropdownActive;
-	std::string selectedTheme;
 
-	// Word Count Slider
+	// Word count slider components
 	sf::Text wordCountLabel;
 	sf::RectangleShape sliderBar;
 	sf::RectangleShape sliderKnob;
 	int wordCount;
 
+	// Global selections
+	std::string selectedDifficulty;
+	std::string selectedTheme;
+
+	// Helper methods
+	void handleDropdownClick(sf::Vector2i mousePos, sf::RectangleShape& dropdown, std::vector<sf::Text>& options, std::string& selectedOption, bool& dropdownActive, bool& otherDropdownActive);
+	void closeAllDropdowns();
+	float getDropdownHeight(const std::vector<sf::Text>& options); // Helper to calculate dropdown height
+
 public:
-	Menu(const sf::Font& font);
-
-	// Displays the menu screen
+	Menu();
 	void displayMenu(sf::RenderWindow& window);
-
-	// Handles user input for the menu
-	void handleEvents(sf::Event& event, sf::RenderWindow& window);
-
-	// Getter methods to retrieve the user's choices
-	std::string getSelectedDifficulty() const { return selectedDifficulty; }
-	std::string getSelectedTheme() const { return selectedTheme; }
-	int getWordCount() const { return wordCount; }
+	std::string getSelectedDifficulty() const;
+	std::string getSelectedTheme() const;
+	int getWordCount() const;
 };
 
 #endif // MENU_H

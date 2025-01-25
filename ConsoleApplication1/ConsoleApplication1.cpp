@@ -29,7 +29,7 @@ int main() {
         return -1;
     }
 	// Menu
-	Menu menu(font);
+	Menu menu;
 
     // Create the grid object
     Grid grid(200, 50, gridSize, cellSize, font);
@@ -226,6 +226,10 @@ int main() {
 		std::string selectedDifficulty = menu.getSelectedDifficulty();
 		std::string selectedTheme = menu.getSelectedTheme();
 		int wordCount = menu.getWordCount();
+
+		std::cout << "Selected Difficulty: " << selectedDifficulty << std::endl;  
+        std::cout << "Selected Theme: " << selectedTheme << std::endl;
+        std::cout << "Word Count: " << wordCount << std::endl;
 
 
         // Draw Player 1
